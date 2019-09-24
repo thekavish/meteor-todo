@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { withTracker } from 'meteor/react-meteor-data'
 
 import { Tasks } from '../api/models/tasks'
-import Task from './comonents/Task'
+import Task from './components/Task'
 
 // App component - represents the whole app
 class App extends Component {
