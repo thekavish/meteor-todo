@@ -1,9 +1,11 @@
 import React, { Component } from 'react'
 import ReactDOM from 'react-dom'
+import { Meteor } from 'meteor/meteor'
 import { withTracker } from 'meteor/react-meteor-data'
 
 import { Tasks } from '../api/models/tasks'
 import Task from './components/Task'
+import AccountsUIWrapper from './components/AccountsUIWrapper.js'
 
 // App component - represents the whole app
 class App extends Component {
@@ -20,14 +22,11 @@ class App extends Component {
 
     // Find the text field via the React ref
     const text = ReactDOM.findDOMNode(this.refs.textInput).value.trim()
-    console.log({
-      text,
-      checked: false,
-      createdAt: new Date(), // current time
-    })
     Tasks.insert({
       text,
       checked: false,
+      owner: Meteor.userId(),           // _id of logged in user
+      username: Meteor.user().username,  // username of logged in user
       createdAt: new Date(), // current time
     })
 
@@ -67,9 +66,12 @@ class App extends Component {
             Hide Completed Tasks
           </label>
 
-          <form className="new-task" onSubmit={this.handleSubmit.bind(this)}>
-            <input type="text" ref="textInput" placeholder="Type to add new tasks" autoFocus/>
-          </form>
+          <AccountsUIWrapper/>
+          {this.props.currentUser ?
+            <form className="new-task" onSubmit={this.handleSubmit.bind(this)}>
+              <input type="text" ref="textInput" placeholder="Type to add new tasks" autoFocus/>
+            </form>
+            : 'Login/Sign Up to add your tasks'}
         </header>
 
         <ul>
@@ -84,5 +86,6 @@ export default withTracker(() => {
   return {
     tasks: Tasks.find({}, { sort: { createdAt: -1 } }).fetch(),
     incompleteCount: Tasks.find({ checked: { $ne: true } }).count(),
+    currentUser: Meteor.user(),
   }
 })(App)
