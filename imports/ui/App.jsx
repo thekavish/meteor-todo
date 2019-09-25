@@ -20,9 +20,14 @@ class App extends Component {
 
     // Find the text field via the React ref
     const text = ReactDOM.findDOMNode(this.refs.textInput).value.trim()
-
+    console.log({
+      text,
+      checked: false,
+      createdAt: new Date(), // current time
+    })
     Tasks.insert({
       text,
+      checked: false,
       createdAt: new Date(), // current time
     })
 
@@ -51,7 +56,7 @@ class App extends Component {
     return (
       <div className="container">
         <header>
-          <h1>Todo List</h1>
+          <h1>Todo List ({this.props.incompleteCount})</h1>
 
           <label className="hide-completed">
             <input
@@ -63,7 +68,7 @@ class App extends Component {
           </label>
 
           <form className="new-task" onSubmit={this.handleSubmit.bind(this)}>
-            <input type="text" ref="textInput" placeholder="Type to add new tasks"/>
+            <input type="text" ref="textInput" placeholder="Type to add new tasks" autoFocus/>
           </form>
         </header>
 
@@ -78,5 +83,6 @@ class App extends Component {
 export default withTracker(() => {
   return {
     tasks: Tasks.find({}, { sort: { createdAt: -1 } }).fetch(),
+    incompleteCount: Tasks.find({ checked: { $ne: true } }).count(),
   }
 })(App)
