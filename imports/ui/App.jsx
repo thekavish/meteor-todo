@@ -41,9 +41,16 @@ class App extends Component {
       filteredTasks = filteredTasks.filter(task => !task.checked)
     }
 
-    return filteredTasks.map((task) => (
-      <Task key={task._id} task={task}/>
-    ))
+    return filteredTasks.map((task) => {
+      const currentUserId = this.props.currentUser && this.props.currentUser._id
+      const showPrivateButton = task.owner === currentUserId
+
+      return (<Task
+        key={task._id}
+        task={task}
+        showPrivateButton={showPrivateButton}
+      />)
+    })
   }
 
   render () {
@@ -62,11 +69,14 @@ class App extends Component {
           </label>
 
           <AccountsUIWrapper/>
-          {this.props.currentUser ?
-            <form className="new-task" onSubmit={this.handleSubmit.bind(this)}>
-              <input type="text" ref="textInput" placeholder="Type to add new tasks" autoFocus/>
-            </form>
-            : 'Login/Sign Up to add your tasks'}
+          {'\n'}
+          {
+            this.props.currentUser ?
+              <form className="new-task" onSubmit={this.handleSubmit.bind(this)}>
+                <input type="text" ref="textInput" placeholder="Type to add new tasks" autoFocus/>
+              </form> :
+              <p>Sign Up/Login to add your tasks</p>
+          }
         </header>
 
         <ul>
